@@ -1,0 +1,91 @@
+<!doctype html>
+<html>
+  <head>
+    <title></title>
+	<meta charset="utf-8">
+	
+	<!-- UIkit CSS -->
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/uikit@3.15.10/dist/css/uikit.min.css" />
+
+	<!-- UIkit JS -->
+	<script src="https://cdn.jsdelivr.net/npm/uikit@3.15.10/dist/js/uikit.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/uikit@3.15.10/dist/js/uikit-icons.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.1.3/axios.min.js"></script>
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jsnview/build/index.css" />
+	<script src="https://cdn.jsdelivr.net/npm/jsnview/build/index.min.js"></script>
+	
+    <style>
+		.hidden { display: none !important; }
+	</style>
+  </head>
+  <body>
+	<div class="waiter hidden" style="
+		position: absolute;
+		height: 100%;
+		width: 100%;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		background: rgba(255,255,255,0.8);
+	"><div uk-spinner></div>
+	</div>
+
+    <div class="uk-container uk-margin">
+		<form>
+			<legend class="uk-legend">Ottieni le running activities da garmin</legend>
+
+			<fieldset class="uk-fieldset">
+
+				<div class="uk-margin">
+					<input class="uk-input login" type="text" placeholder="Login">
+				</div>
+				<div class="uk-margin">
+					<input class="uk-input password" type="password" placeholder="Password">
+				</div>
+				<div class="uk-margin">
+					<button class="uk-button uk-button-primary connect">Connetti a Garmin</button>
+				</div>
+
+			</fieldset>
+		</form>
+		<div class="uk-margin">
+			<div class="output">
+
+			</div>
+		</div>
+	</div>
+
+
+	<script>
+	window.addEventListener('load', (event) => {
+		document.querySelector(".connect").addEventListener("click",async (evt)=>{
+			evt.preventDefault()
+			let L = document.querySelector(".login").value
+			let P = document.querySelector(".password").value
+			document.querySelector(".output").innerHTML = ""
+			document.querySelector(".waiter").classList.remove("hidden")
+			try {
+				let R = await axios.post("/api/activities/get",{login: L, password: P})
+				const options = {
+					showLen: false,
+					showType: false,
+					showBrackets: true,
+					showFoldmarker: false,
+					colors: { boolean: '#ff2929', null: '#ff2929', string: '#690', number: '#905', float: '#002f99' }
+				}
+
+				const treeView = jsnview(R, options); // returns HTMLElement
+				
+				document.querySelector(".output").appendChild(treeView);
+			}
+			catch (e){
+				console.log(e)
+			}
+			document.querySelector(".waiter").classList.add("hidden")
+
+		})
+	});
+
+	</script>
+  </body>
+</html>
